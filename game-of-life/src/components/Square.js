@@ -1,43 +1,42 @@
 import React from "react";
-import { doc } from "prettier";
-
-const handleClick = (e) => {
-  if (e.target.style.backgroundColor === "yellow") {
-    e.target.style.backgroundColor = "white";
-    return;
-  }
-  e.target.style.backgroundColor = "yellow";
-};
-
-const handleHover = (e) => {
-  if (mouseDown) {
-    if (e.target.style.backgroundColor === "yellow") {
-      e.target.style.backgroundColor = "white";
-    } else {
-      e.target.style.backgroundColor = "yellow";
-    }
-  }
-};
-
-var mouseDown = 0;
-document.body.onmousedown = () => {
-  ++mouseDown;
-};
-document.body.onmouseup = () => {
-  --mouseDown;
-};
+import { useState, useEffect } from "react";
 
 const Square = (props) => {
-  const { sideLength } = props;
+  const { index, sideLength, isAlive, callback } = props;
+  const styleClassNames = { alive: "square-alive", dead: "square-dead" };
+  const [alive, setAlive] = useState(isAlive);
+  const [style, setStyle] = useState(styleClassNames.dead);
+  const onCellChange = callback;
+
+  useEffect(() => {
+    changeStyle(isAlive);
+  });
+
+  useEffect(() => {
+    changeStyle();
+  }, [alive]);
+
+  const handleClick = (e) => {
+    setAlive((prevState) => {
+      let newState = !prevState;
+      return newState;
+    });
+    onCellChange(index);
+  };
+
+  const changeStyle = (cond) => {
+    if (cond) {
+      setStyle(styleClassNames.alive);
+    } else {
+      setStyle(styleClassNames.dead);
+    }
+  };
+
   return (
     <div
-      className={"square"}
-      style={{
-        width: `${sideLength}px`,
-        height: `${sideLength}px`,
-      }}
+      className={style}
+      style={{ height: `${sideLength}px`, width: `${sideLength}px` }}
       onClick={handleClick}
-      onMouseEnter={handleHover}
     />
   );
 };

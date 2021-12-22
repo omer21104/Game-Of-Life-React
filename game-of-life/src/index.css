@@ -7,6 +7,30 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.grid {
+  font-size: 0;
+  margin: 25px;
+  /*margin-top: -1px;*/
+  /*margin-left: -1px;*/
+  outline: 1px solid;
+}
+
+.square-dead {
+
+  display: inline-block;
+  outline: 1px solid;
+  border-right: none;
+  background: white;
+}
+
+.square-alive {
+
+  display: inline-block;
+  outline: 1px solid;
+  border-right: none;
+  background: yellow;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
