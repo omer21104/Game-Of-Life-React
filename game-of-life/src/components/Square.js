@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 const Square = (props) => {
   const { index, sideLength, isAlive, callback } = props;
   const styleClassNames = { alive: "square-alive", dead: "square-dead" };
-  const [alive, setAlive] = useState(isAlive);
   const [style, setStyle] = useState(styleClassNames.dead);
   const onCellChange = callback;
 
@@ -12,20 +11,12 @@ const Square = (props) => {
     changeStyle(isAlive);
   });
 
-  useEffect(() => {
-    changeStyle();
-  }, [alive]);
-
-  const handleClick = (e) => {
-    setAlive((prevState) => {
-      let newState = !prevState;
-      return newState;
-    });
+  const handleClick = () => {
     onCellChange(index);
   };
 
-  const changeStyle = (cond) => {
-    if (cond) {
+  const changeStyle = () => {
+    if (isAlive) {
       setStyle(styleClassNames.alive);
     } else {
       setStyle(styleClassNames.dead);

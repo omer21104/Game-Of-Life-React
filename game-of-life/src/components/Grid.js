@@ -18,10 +18,12 @@ const Grid = (props) => {
   };
   const [matrix, setMatrix] = useState(initMatrix());
 
-  useEffect(() => {}, [matrix]);
-
   const onCellLifeChange = (cellIndex) => {
-    matrix[cellIndex].alive = !matrix[cellIndex].alive;
+    setMatrix((prevState) => {
+      let newMatrix = Array.from(prevState);
+      newMatrix[cellIndex].alive = !newMatrix[cellIndex].alive;
+      return newMatrix;
+    });
   };
 
   const clearCells = () => {
@@ -31,7 +33,7 @@ const Grid = (props) => {
         let { index, alive } = prevState[i];
         newMatrix.push({
           index: index,
-          alive: index % 2 == 0 ? alive : !alive,
+          alive: false,
         });
       }
       return newMatrix;

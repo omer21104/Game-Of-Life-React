@@ -2,9 +2,9 @@ import Grid from "./components/Grid";
 
 function App() {
   return (
-      <>
-      <Grid rows={13} cols={23} cellSideLength={25} />
-      </>
+    <>
+      <Grid rows={15} cols={20} cellSideLength={20} />
+    </>
   );
 }
 
