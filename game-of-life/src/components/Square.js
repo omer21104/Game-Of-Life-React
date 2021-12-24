@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 
 const Square = (props) => {
-  const { index, sideLength, isAlive, callback } = props;
+  const { i, j, sideLength, isAlive, callback } = props;
   const styleClassNames = { alive: "square-alive", dead: "square-dead" };
   const [style, setStyle] = useState(styleClassNames.dead);
   const onCellChange = callback;
@@ -12,7 +12,7 @@ const Square = (props) => {
   });
 
   const handleClick = () => {
-    onCellChange(index);
+    onCellChange(i, j);
   };
 
   const changeStyle = () => {

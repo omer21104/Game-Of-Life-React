@@ -4,57 +4,124 @@ import { useState, useEffect } from "react";
 
 const Grid = (props) => {
   const { rows, cols, cellSideLength } = props;
-  let idNum = 0;
+  const [intervalID, setIntervalID] = useState();
+
+  const timeSlice = 800;
+  let tickID;
 
   const initMatrix = () => {
     let tempMatrix = [];
     for (let i = 0; i < rows; i++) {
+      let row = [];
       for (let j = 0; j < cols; j++) {
-        tempMatrix.push({ index: idNum, alive: false });
-        idNum += 1;
+        row.push({ i: i, j: j, alive: false });
       }
+      tempMatrix.push(row);
     }
     return tempMatrix;
   };
   const [matrix, setMatrix] = useState(initMatrix());
 
-  const onCellLifeChange = (cellIndex) => {
+  // useEffect(() => {
+  //   console.log("hi");
+  // }, [intervalID]);
+
+  const onCellLifeChange = (i, j) => {
     setMatrix((prevState) => {
-      let newMatrix = Array.from(prevState);
-      newMatrix[cellIndex].alive = !newMatrix[cellIndex].alive;
+      let newMatrix = Array.from(matrix);
+      newMatrix[i][j].alive = !newMatrix[i][j].alive;
+
       return newMatrix;
     });
   };
 
   const clearCells = () => {
-    setMatrix((prevState) => {
-      let newMatrix = [];
-      for (let i = 0; i < prevState.length; i++) {
-        let { index, alive } = prevState[i];
-        newMatrix.push({
-          index: index,
-          alive: false,
-        });
-      }
-      return newMatrix;
+    clearInterval(intervalID);
+    setMatrix(() => {
+      return initMatrix();
     });
   };
+
+  const countLiveNeighbors = (rowIndex, colIndex, prevState) => {
+    let currentCellLiveNeighbors = 0;
+
+    for (let i = rowIndex - 1; i < rowIndex - 1 + 3; i++) {
+      for (let j = colIndex - 1; j < colIndex - 1 + 3; j++) {
+        if (i === rowIndex && j === colIndex) {
+          continue;
+        }
+        try {
+          if (prevState[i][j].alive) {
+            currentCellLiveNeighbors++;
+          }
+        } catch (e) {}
+      }
+    }
+
+    return currentCellLiveNeighbors;
+  };
+
+  const startInterval = () => {
+    setIntervalID(setInterval(() => tick(), timeSlice));
+  };
+
+  const pauseGame = () => {
+    clearInterval(intervalID);
+  };
+
+  const tick = () => {
+    setMatrix((prevState) => {
+      let newState = Array.from(prevState);
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          let currentCellLiveNeighbors = countLiveNeighbors(i, j, prevState);
+          let currentCell = prevState[i][j];
+
+          if (currentCell.alive) {
+            if (
+              currentCellLiveNeighbors === 2 ||
+              currentCellLiveNeighbors === 3
+            ) {
+              newState[i][j].alive = true;
+            } else {
+              newState[i][j].alive = false;
+            }
+          } else {
+            if (currentCellLiveNeighbors === 3) {
+              newState[i][j].alive = true;
+            }
+          }
+        }
+      }
+
+      return newState;
+    });
+  };
+
   return (
     <>
       <div className={"grid"} style={{ width: cellSideLength * cols }}>
-        {matrix.map((cell) => {
-          const { alive, index } = cell;
+        {matrix.map((row) => {
           return (
-            <Square
-              index={index}
-              sideLength={cellSideLength}
-              isAlive={alive}
-              callback={onCellLifeChange}
-            />
+            <div>
+              {row.map((cell) => {
+                const { i, j, alive } = cell;
+                return (
+                  <Square
+                    i={i}
+                    j={j}
+                    isAlive={alive}
+                    sideLength={cellSideLength}
+                    callback={onCellLifeChange}
+                  />
+                );
+              })}
+            </div>
           );
         })}
       </div>
-      <button>start</button>
+      <button onClick={startInterval}>start</button>
+      <button onClick={pauseGame}>pause</button>
       <button onClick={clearCells}>clear</button>
     </>
   );
