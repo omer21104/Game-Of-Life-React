@@ -4,10 +4,17 @@ import { useState, useEffect } from "react";
 
 const Grid = (props) => {
   const { rows, cols, cellSideLength } = props;
-  const [intervalID, setIntervalID] = useState();
+  const [intervalID, setIntervalID] = useState(0);
+  const [timeSlice, setTimeSlice] = useState(500);
+  const [running, setRunning] = useState(false);
 
-  const timeSlice = 800;
-  let tickID;
+  useEffect(() => {
+    if (running) {
+      clearInterval(intervalID);
+      setIntervalID(setInterval(() => tick(), timeSlice));
+    }
+    setMatrix((prevState) => prevState);
+  }, [timeSlice, running]);
 
   const initMatrix = () => {
     let tempMatrix = [];
@@ -22,17 +29,15 @@ const Grid = (props) => {
   };
   const [matrix, setMatrix] = useState(initMatrix());
 
-  // useEffect(() => {
-  //   console.log("hi");
-  // }, [intervalID]);
-
   const onCellLifeChange = (i, j) => {
     setMatrix((prevState) => {
-      let newMatrix = Array.from(matrix);
+      let newMatrix = Array.from(prevState);
       newMatrix[i][j].alive = !newMatrix[i][j].alive;
 
       return newMatrix;
     });
+
+    setMatrix((prevState) => prevState);
   };
 
   const clearCells = () => {
@@ -40,6 +45,8 @@ const Grid = (props) => {
     setMatrix(() => {
       return initMatrix();
     });
+
+    document.getElementById("btn-start").disabled = false;
   };
 
   const countLiveNeighbors = (rowIndex, colIndex, prevState) => {
@@ -62,11 +69,18 @@ const Grid = (props) => {
   };
 
   const startInterval = () => {
+    setRunning(true);
     setIntervalID(setInterval(() => tick(), timeSlice));
+    document.getElementById("btn-start").disabled = true;
   };
 
   const pauseGame = () => {
+    setRunning(false);
     clearInterval(intervalID);
+    document.getElementById("btn-start").disabled = false;
+    setMatrix((prevState) => {
+      return prevState;
+    });
   };
 
   const tick = () => {
@@ -98,6 +112,12 @@ const Grid = (props) => {
     });
   };
 
+  const handleSliderChange = (e) => {
+    setTimeSlice(e.target.value);
+  };
+
+  const test = () => {};
+
   return (
     <>
       <div className={"grid"} style={{ width: cellSideLength * cols }}>
@@ -120,9 +140,27 @@ const Grid = (props) => {
           );
         })}
       </div>
-      <button onClick={startInterval}>start</button>
-      <button onClick={pauseGame}>pause</button>
-      <button onClick={clearCells}>clear</button>
+      <div className={"center-wrapper"}>
+        <div className={"center-inner-wrapper"}>
+          <button onClick={startInterval} id={"btn-start"}>
+            start
+          </button>
+          <button onClick={pauseGame}>pause</button>
+          <button onClick={clearCells}>clear</button>
+          <button onClick={test}>test</button>
+        </div>
+        <div className={"center-inner-wrapper"}>
+          <label>tick speed </label>
+          <input
+            onChange={handleSliderChange}
+            type="range"
+            min={200}
+            max={1500}
+            id={"range-slider"}
+          />
+          <span>{timeSlice} ms</span>
+        </div>
+      </div>
     </>
   );
 };

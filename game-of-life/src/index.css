@@ -13,6 +13,15 @@ body {
   outline: 1px solid;
 }
 
+.center-inner-wrapper {
+  display: table;
+  margin: 0 auto;
+}
+
+.center-wrapper {
+  width: 100%;
+}
+
 .square-dead {
   display: inline-block;
   outline: 1px solid;
